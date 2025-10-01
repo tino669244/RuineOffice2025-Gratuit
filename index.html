@@ -1,40 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Office Web Gratuit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Office Gratuit Web</title>
+
+  <!-- CSS externe -->
   <link rel="stylesheet" href="style.css">
+
+  <!-- Librairies nécessaires -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/docx.umd.min.js"></script>
 </head>
 <body>
   <header>
-    <h1>📄 Office Web Gratuit</h1>
-    <p>Convertir vos fichiers PDF, Word et Excel facilement</p>
+    <h1>📂 Office Gratuit Web</h1>
+    <p>Convertissez vos fichiers facilement (PDF ↔ Word ↔ Excel)</p>
   </header>
 
   <main>
+    <!-- Zone upload -->
     <div class="upload-box" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      <p>📂 Glissez-déposez un fichier ici ou cliquez pour en choisir</p>
+      <p>Glissez-déposez un fichier ici ou cliquez pour en choisir</p>
       <input type="file" id="fileInput" hidden />
     </div>
 
+    <!-- Preview Fichier -->
+    <div id="filePreview" style="display:none; text-align:center;">
+      <h3>📑 Fichier sélectionné :</h3>
+      <p id="fileName"></p>
+      <canvas id="pdfPreview" style="max-width:300px; display:none; border:1px solid #ccc; margin:10px auto;"></canvas>
+    </div>
+
+    <!-- Choix conversion -->
     <select id="conversionType">
       <option value="pdf2word">PDF → Word</option>
       <option value="pdf2excel">PDF → Excel</option>
       <option value="excel2word">Excel → Word</option>
     </select>
 
+    <!-- Bouton Convertir -->
     <button onclick="convertFile()">🚀 Convertir</button>
+
+    <!-- Lien téléchargement -->
     <a id="downloadLink" style="display:none;">⬇ Télécharger</a>
   </main>
 
   <footer>
-    <p>Made with ❤️ | <a href="https://github.com/">GitHub</a></p>
+    <p>© 2025 Office Gratuit Web | Conversion locale, sécurisée</p>
   </footer>
 
-  <!-- 📚 Librairies -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.0.1/docx.umd.js"></script>
+  <!-- Script logique -->
   <script src="app.js"></script>
 </body>
 </html>
