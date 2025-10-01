@@ -32,7 +32,7 @@ async function handleFile(file) {
   filePreview.style.display = "block";
   fileNameEl.textContent = file.name;
 
-  // Raha PDF → aseho ny pejy voalohany
+  // Raha PDF → aseho pejy voalohany
   if (file.type === "application/pdf") {
     const pdfData = new Uint8Array(await file.arrayBuffer());
     const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
