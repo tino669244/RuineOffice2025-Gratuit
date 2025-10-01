@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Office Web Gratuit</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Office Web Gratuit</h1>
+    <input type="file" id="fileInput" />
+    <select id="conversionType">
+      <option value="pdf2word">PDF → Word</option>
+      <option value="pdf2excel">PDF → Excel</option>
+      <option value="excel2word">Excel → Word</option>
+    </select>
+    <button onclick="convertFile()">Convertir</button>
+    <a id="downloadLink" style="display:none;">⬇ Télécharger</a>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.0.1/docx.umd.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
