@@ -8,6 +8,9 @@ async function convertFile() {
     return;
   }
 
+  // -------------------------
+  // Excel → Word
+  // -------------------------
   if (type === "excel2word") {
     const data = await fileInput.arrayBuffer();
     const workbook = XLSX.read(data, {type:"array"});
@@ -25,11 +28,17 @@ async function convertFile() {
     link.style.display = "block";
   }
 
+  // -------------------------
+  // PDF → Excel (demo only)
+  // -------------------------
   if (type === "pdf2excel") {
-    alert("Demo: mila pdf.js ho an'ny tena parsing an'ny table PDF"); 
+    alert("⚠️ PDF → Excel mbola mila parser toy ny pdf.js. Demo ihany izao.");
   }
 
+  // -------------------------
+  // PDF → Word (demo only)
+  // -------------------------
   if (type === "pdf2word") {
-    alert("Demo: mila pdf-lib na pdf.js + docx.js"); 
+    alert("⚠️ PDF → Word mbola mila pdf-lib na pdf.js + docx.js. Demo ihany izao.");
   }
 }
