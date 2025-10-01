@@ -1,18 +1,50 @@
-async function convertFile() {
-  const fileInput = document.getElementById("fileInput").files[0];
-  const type = document.getElementById("conversionType").value;
-  const link = document.getElementById("downloadLink");
+const dropZone = document.getElementById("dropZone");
+const fileInput = document.getElementById("fileInput");
 
-  if (!fileInput) {
+let selectedFile = null;
+
+// ---- Drag & Drop Events ----
+dropZone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropZone.classList.add("dragover");
+});
+
+dropZone.addEventListener("dragleave", () => {
+  dropZone.classList.remove("dragover");
+});
+
+dropZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropZone.classList.remove("dragover");
+
+  if (e.dataTransfer.files.length > 0) {
+    selectedFile = e.dataTransfer.files[0];
+    fileInput.files = e.dataTransfer.files; // mitovy amin'ny click
+    dropZone.innerHTML = `<p>✅ ${selectedFile.name} nalefa soa aman-tsara</p>`;
+  }
+});
+
+// ---- File selection via click ----
+fileInput.addEventListener("change", () => {
+  if (fileInput.files.length > 0) {
+    selectedFile = fileInput.files[0];
+    dropZone.innerHTML = `<p>✅ ${selectedFile.name} nalefa soa aman-tsara</p>`;
+  }
+});
+
+// ---- Conversion ----
+async function convertFile() {
+  const link = document.getElementById("downloadLink");
+  const type = document.getElementById("conversionType").value;
+
+  if (!selectedFile) {
     alert("Mba misafidiana fichier azafady !");
     return;
   }
 
-  // -------------------------
   // Excel → Word
-  // -------------------------
   if (type === "excel2word") {
-    const data = await fileInput.arrayBuffer();
+    const data = await selectedFile.arrayBuffer();
     const workbook = XLSX.read(data, {type:"array"});
     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
     const sheetData = XLSX.utils.sheet_to_csv(firstSheet);
@@ -28,11 +60,9 @@ async function convertFile() {
     link.style.display = "block";
   }
 
-  // -------------------------
   // PDF → Word
-  // -------------------------
   if (type === "pdf2word") {
-    const pdfData = new Uint8Array(await fileInput.arrayBuffer());
+    const pdfData = new Uint8Array(await selectedFile.arrayBuffer());
     const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
 
     let fullText = "";
@@ -53,11 +83,9 @@ async function convertFile() {
     link.style.display = "block";
   }
 
-  // -------------------------
   // PDF → Excel
-  // -------------------------
   if (type === "pdf2excel") {
-    const pdfData = new Uint8Array(await fileInput.arrayBuffer());
+    const pdfData = new Uint8Array(await selectedFile.arrayBuffer());
     const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
 
     let rows = [];
