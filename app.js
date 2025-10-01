@@ -29,16 +29,54 @@ async function convertFile() {
   }
 
   // -------------------------
-  // PDF → Excel (demo only)
+  // PDF → Word
   // -------------------------
-  if (type === "pdf2excel") {
-    alert("⚠️ PDF → Excel mbola mila parser toy ny pdf.js. Demo ihany izao.");
+  if (type === "pdf2word") {
+    const pdfData = new Uint8Array(await fileInput.arrayBuffer());
+    const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+
+    let fullText = "";
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      fullText += textContent.items.map(item => item.str).join(" ") + "\n\n";
+    }
+
+    const { Document, Packer, Paragraph } = docx;
+    const doc = new Document({
+      sections: [{ properties:{}, children: [new Paragraph(fullText)] }]
+    });
+
+    const blob = await Packer.toBlob(doc);
+    link.href = URL.createObjectURL(blob);
+    link.download = "output.docx";
+    link.style.display = "block";
   }
 
   // -------------------------
-  // PDF → Word (demo only)
+  // PDF → Excel
   // -------------------------
-  if (type === "pdf2word") {
-    alert("⚠️ PDF → Word mbola mila pdf-lib na pdf.js + docx.js. Demo ihany izao.");
+  if (type === "pdf2excel") {
+    const pdfData = new Uint8Array(await fileInput.arrayBuffer());
+    const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+
+    let rows = [];
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const line = textContent.items.map(item => item.str).join(" ");
+      rows.push([line]);
+    }
+
+    const worksheet = XLSX.utils.aoa_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "PDFtoExcel");
+
+    const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([wbout], { type: "application/octet-stream" });
+
+    link.href = URL.createObjectURL(blob);
+    link.download = "output.xlsx";
+    link.style.display = "block";
   }
 }
