@@ -1,8 +1,11 @@
 const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
+const filePreview = document.getElementById("filePreview");
+const fileNameEl = document.getElementById("fileName");
+const pdfCanvas = document.getElementById("pdfPreview");
 let selectedFile = null;
 
-// Drag & drop
+// ---- Drag & Drop ----
 dropZone.addEventListener("dragover", (e) => {
   e.preventDefault();
   dropZone.classList.add("dragover");
@@ -14,19 +17,40 @@ dropZone.addEventListener("drop", (e) => {
   e.preventDefault();
   dropZone.classList.remove("dragover");
   if (e.dataTransfer.files.length > 0) {
-    selectedFile = e.dataTransfer.files[0];
-    fileInput.files = e.dataTransfer.files;
-    dropZone.innerHTML = `<p>✅ ${selectedFile.name} nalefa soa aman-tsara</p>`;
+    handleFile(e.dataTransfer.files[0]);
   }
 });
 fileInput.addEventListener("change", () => {
   if (fileInput.files.length > 0) {
-    selectedFile = fileInput.files[0];
-    dropZone.innerHTML = `<p>✅ ${selectedFile.name} nalefa soa aman-tsara</p>`;
+    handleFile(fileInput.files[0]);
   }
 });
 
-// Conversion
+// ---- Gestion fichier ----
+async function handleFile(file) {
+  selectedFile = file;
+  filePreview.style.display = "block";
+  fileNameEl.textContent = file.name;
+
+  // Raha PDF → aseho ny pejy voalohany
+  if (file.type === "application/pdf") {
+    const pdfData = new Uint8Array(await file.arrayBuffer());
+    const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+    const page = await pdf.getPage(1);
+    const viewport = page.getViewport({ scale: 0.5 });
+    const context = pdfCanvas.getContext("2d");
+
+    pdfCanvas.height = viewport.height;
+    pdfCanvas.width = viewport.width;
+    pdfCanvas.style.display = "block";
+
+    await page.render({ canvasContext: context, viewport: viewport }).promise;
+  } else {
+    pdfCanvas.style.display = "none";
+  }
+}
+
+// ---- Conversion ----
 async function convertFile() {
   const type = document.getElementById("conversionType").value;
   const link = document.getElementById("downloadLink");
