@@ -1,12 +1,11 @@
 const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
-const filePreview = document.getElementById("filePreview");
-const fileNameEl = document.getElementById("fileName");
-const pdfCanvas = document.getElementById("pdfPreview");
+const editorBox = document.getElementById("editorBox");
+const textEditor = document.getElementById("textEditor");
 
-let selectedFile = null;
+let fileContent = "";
 
-// --- Upload & Preview ---
+// --- Drag & Drop Upload ---
 dropZone.addEventListener("dragover", (e) => {
   e.preventDefault();
   dropZone.classList.add("dragover");
@@ -26,97 +25,97 @@ fileInput.addEventListener("change", () => {
   if (fileInput.files.length > 0) handleFile(fileInput.files[0]);
 });
 
+// --- Lire fichier ---
 async function handleFile(file) {
-  selectedFile = file;
-  filePreview.style.display = "block";
-  fileNameEl.textContent = file.name;
+  const reader = new FileReader();
 
   if (file.type === "application/pdf") {
     const pdfData = new Uint8Array(await file.arrayBuffer());
     const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
-    const page = await pdf.getPage(1);
-    const viewport = page.getViewport({ scale: 0.5 });
-    const context = pdfCanvas.getContext("2d");
-    pdfCanvas.height = viewport.height;
-    pdfCanvas.width = viewport.width;
-    pdfCanvas.style.display = "block";
-    await page.render({ canvasContext: context, viewport: viewport }).promise;
-  } else {
-    pdfCanvas.style.display = "none";
+    let text = "";
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      text += textContent.items.map(item => item.str).join(" ") + "\n\n";
+    }
+
+    fileContent = text;
+    textEditor.value = text;
+    editorBox.style.display = "block";
+  }
+  else if (file.type.includes("excel")) {
+    reader.onload = function(e) {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      const csv = XLSX.utils.sheet_to_csv(firstSheet);
+      fileContent = csv;
+      textEditor.value = csv;
+      editorBox.style.display = "block";
+    };
+    reader.readAsArrayBuffer(file);
+  }
+  else if (file.type.includes("word") || file.name.endsWith(".docx")) {
+    alert("Lecture Word simplifiée : texte brut seulement");
+    reader.onload = function(e) {
+      fileContent = e.target.result;
+      textEditor.value = e.target.result;
+      editorBox.style.display = "block";
+    };
+    reader.readAsText(file);
+  }
+  else {
+    reader.onload = function(e) {
+      fileContent = e.target.result;
+      textEditor.value = e.target.result;
+      editorBox.style.display = "block";
+    };
+    reader.readAsText(file);
   }
 }
 
-// --- Conversion ---
-async function convertFile() {
+// --- Convertir & Télécharger ---
+async function convertAndDownload() {
   const type = document.getElementById("conversionType").value;
-  const link = document.getElementById("downloadLink");
-  const resultBox = document.getElementById("resultBox");
+  const content = textEditor.value;
 
-  if (!selectedFile) {
-    alert("Sélectionnez un fichier");
-    return;
+  if (type === "word") {
+    const { Document, Packer, Paragraph } = window.docx;
+    const doc = new Document({
+      sections: [{ children: [new Paragraph(content)] }]
+    });
+
+    const blob = await Packer.toBlob(doc);
+    downloadBlob(blob, "output.docx");
   }
-
-  resultBox.style.display = "block";
-
-  if (type === "excel2word") {
-    const data = await selectedFile.arrayBuffer();
-    const workbook = XLSX.read(data, { type: "array" });
-    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-    const sheetData = XLSX.utils.sheet_to_csv(firstSheet);
-
-    const { Document, Packer, Paragraph } = window.docx;
-    const doc = new Document({
-      sections: [{ children: [new Paragraph(sheetData)] }]
-    });
-
-    const blob = await Packer.toBlob(doc);
-    link.href = URL.createObjectURL(blob);
-    link.download = "output.docx";
-    link.textContent = "⬇ Télécharger Word";
-  } 
-  else if (type === "pdf2word") {
-    const pdfData = new Uint8Array(await selectedFile.arrayBuffer());
-    const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
-    let fullText = "";
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      fullText += textContent.items.map(item => item.str).join(" ") + "\n\n";
-    }
-
-    const { Document, Packer, Paragraph } = window.docx;
-    const doc = new Document({
-      sections: [{ children: [new Paragraph(fullText)] }]
-    });
-
-    const blob = await Packer.toBlob(doc);
-    link.href = URL.createObjectURL(blob);
-    link.download = "output.docx";
-    link.textContent = "⬇ Télécharger Word";
-  } 
-  else if (type === "pdf2excel") {
-    const pdfData = new Uint8Array(await selectedFile.arrayBuffer());
-    const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
-    let rows = [];
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      const line = textContent.items.map(item => item.str).join(" ");
-      rows.push([line]);
-    }
-
+  else if (type === "excel") {
+    const rows = content.split("\n").map(r => r.split(","));
     const worksheet = XLSX.utils.aoa_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "PDFtoExcel");
-
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
     const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
     const blob = new Blob([wbout], { type: "application/octet-stream" });
-
-    link.href = URL.createObjectURL(blob);
-    link.download = "output.xlsx";
-    link.textContent = "⬇ Télécharger Excel";
+    downloadBlob(blob, "output.xlsx");
   }
+  else if (type === "pdf") {
+    const { jsPDF } = window.jspdf || {};
+    if (!jsPDF) {
+      alert("Librairie jsPDF manquant, mila ampidirina raha PDF export");
+      return;
+    }
+    const doc = new jsPDF();
+    doc.text(content, 10, 10);
+    doc.save("output.pdf");
+  }
+}
+
+// --- Download helper ---
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }
