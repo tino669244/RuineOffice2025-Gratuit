@@ -1,9 +1,9 @@
 body {
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
   margin: 0;
   padding: 0;
-  color: #333;
+  color: white;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -12,7 +12,6 @@ body {
 header {
   text-align: center;
   padding: 20px;
-  color: white;
 }
 
 header h1 {
@@ -37,18 +36,31 @@ main {
   cursor: pointer;
   transition: background 0.3s;
   width: 300px;
+  margin-bottom: 20px;
 }
 
 .upload-box:hover {
   background: rgba(255, 255, 255, 0.3);
 }
 
-.dragover {
-  background: rgba(0, 255, 200, 0.4) !important;
+textarea {
+  width: 80%;
+  height: 300px;
+  padding: 15px;
+  border-radius: 10px;
+  border: none;
+  font-size: 1em;
+  color: #333;
+}
+
+.action-row {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
 }
 
 select, button {
-  margin-top: 20px;
   padding: 10px 15px;
   border-radius: 10px;
   border: none;
@@ -56,52 +68,12 @@ select, button {
   font-size: 1em;
 }
 
-select {
-  background: white;
-}
-
 button {
   background: #ff7eb3;
   color: white;
   font-weight: bold;
-  transition: background 0.3s;
 }
 
 button:hover {
   background: #ff4a91;
-}
-
-a {
-  display: block;
-  margin-top: 20px;
-  padding: 10px 15px;
-  background: #4caf50;
-  color: white;
-  text-decoration: none;
-  border-radius: 10px;
-  font-weight: bold;
-}
-
-a:hover {
-  background: #388e3c;
-}
-
-footer {
-  text-align: center;
-  padding: 10px;
-  background: rgba(0,0,0,0.2);
-  color: white;
-  font-size: 0.9em;
-}
-
-.action-row {
-  margin-top: 30px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-#resultBox {
-  min-width: 200px;
-  text-align: center;
 }
