@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Office Gratuit Web</title>
+<title>Office Gratuit Modif</title>
 <link rel="stylesheet" href="style.css">
 
-<!-- Librairies en CDN -->
+<!-- Librairies -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -14,43 +14,36 @@
 </head>
 <body>
 <header>
-  <h1>📂 Office Gratuit Web</h1>
-  <p>Convertissez vos fichiers facilement (PDF ↔ Word ↔ Excel)</p>
+  <h1>📂 Office Gratuit Modif</h1>
+  <p>Importer – Modifier – Convertir – Télécharger</p>
 </header>
 
 <main>
-  <!-- Zone Upload -->
+  <!-- Upload -->
   <div class="upload-box" id="dropZone" onclick="document.getElementById('fileInput').click()">
-    <p>Glissez-déposez un fichier ici ou cliquez pour en choisir</p>
+    <p>Glissez-déposez un fichier ou cliquez</p>
     <input type="file" id="fileInput" hidden />
   </div>
 
-  <!-- Preview fichier -->
-  <div id="filePreview" style="display:none; text-align:center;">
-    <h3>📑 Fichier sélectionné :</h3>
-    <p id="fileName"></p>
-    <canvas id="pdfPreview" style="max-width:300px; display:none; border:1px solid #ccc; margin:10px auto;"></canvas>
+  <!-- Zone de modification -->
+  <div id="editorBox" style="display:none;">
+    <h3>📝 Modification du contenu</h3>
+    <textarea id="textEditor"></textarea>
   </div>
 
   <!-- Actions -->
   <div class="action-row">
     <select id="conversionType">
-      <option value="pdf2word">PDF → Word</option>
-      <option value="pdf2excel">PDF → Excel</option>
-      <option value="excel2word">Excel → Word</option>
+      <option value="word">Enregistrer en Word</option>
+      <option value="excel">Enregistrer en Excel</option>
+      <option value="pdf">Enregistrer en PDF</option>
     </select>
-    <button onclick="convertFile()">🚀 Convertir</button>
-
-    <!-- Résultat -->
-    <div id="resultBox" style="display:none; margin-left:20px; padding:15px; border:2px solid #4caf50; border-radius:10px; background:#e9ffe9;">
-      <h4>✅ Fichier converti :</h4>
-      <a id="downloadLink">⬇ Télécharger</a>
-    </div>
+    <button onclick="convertAndDownload()">💾 Convertir & Télécharger</button>
   </div>
 </main>
 
 <footer>
-  <p>© 2025 Office Gratuit Web | Conversion locale, sécurisée</p>
+  <p>© 2025 Office Gratuit Web</p>
 </footer>
 
 <script src="app.js"></script>
