@@ -9,12 +9,11 @@
   <!-- Librairies -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/docx.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <!-- CKEditor -->
-  <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
+  <!-- DOCX Preview -->
+  <script src="https://cdn.jsdelivr.net/npm/docx-preview@0.4.2/dist/docx-preview.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docx-preview@0.4.2/dist/docx-preview.css">
 </head>
 <body>
   <header>
@@ -27,7 +26,7 @@
       </ul>
     </nav>
     <h1>Office Gratuit Web</h1>
-    <p>Importer – Modifier – Convertir – Télécharger</p>
+    <p>Importer – Visualiser – Convertir – Télécharger</p>
   </header>
 
   <main>
@@ -37,10 +36,10 @@
       <input type="file" id="fileInput" hidden />
     </div>
 
-    <!-- Éditeur -->
-    <div id="editorContainer" style="display:none;">
-      <h3>📝 Document</h3>
-      <div id="editor"></div>
+    <!-- Preview -->
+    <div id="viewerContainer" style="display:none;">
+      <h3>📖 Document</h3>
+      <div id="viewer" class="viewer-box"></div>
     </div>
 
     <!-- Actions -->
