@@ -5,7 +5,6 @@ ClassicEditor.create(document.querySelector('#editor'))
   .then(editor => { editorInstance = editor; })
   .catch(err => console.error(err));
 
-// Handle Upload PDF
 document.getElementById('fileInput').addEventListener('change', async (e)=>{
   const file = e.target.files[0];
   if(!file) return;
@@ -16,20 +15,54 @@ document.getElementById('fileInput').addEventListener('change', async (e)=>{
   if(ext === "pdf") {
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    let textContent = "";
+    let fullText = "";
 
     for(let i=1;i<=pdf.numPages;i++){
       const page = await pdf.getPage(i);
+
+      // Text content classique
       const text = await page.getTextContent();
-      text.items.forEach(item => { textContent += item.str + " "; });
-      textContent += "\n\n";
+      let pageText = "";
+      text.items.forEach(item => { pageText += item.str + " "; });
+      pageText += "\n\n";
+
+      // Si PDF text layer vide, lance OCR
+      if(pageText.trim() === ""){
+        const viewport = page.getViewport({ scale: 2 });
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({canvasContext: canvas.getContext("2d"), viewport}).promise;
+
+        const { data: { text: ocrText } } = await Tesseract.recognize(canvas, 'fra', { logger: m => console.log(m) });
+        pageText = ocrText + "\n\n";
+      }
+
+      fullText += pageText;
     }
 
-    editorInstance.setData(textContent);
+    editorInstance.setData(fullText);
     document.getElementById('editorContainer').style.display="block";
 
+  } else if(ext === "png" || ext === "jpg" || ext === "jpeg") {
+    reader.onload = async (event)=>{
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = async ()=>{
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img,0,0);
+        const { data: { text } } = await Tesseract.recognize(canvas,'fra',{ logger:m=>console.log(m)});
+        editorInstance.setData(text);
+        document.getElementById('editorContainer').style.display="block";
+      }
+    };
+    reader.readAsDataURL(file);
+
   } else {
-    alert("Seul PDF est supporté pour édition actuellement.");
+    alert("Format non supporté. PDF / PNG / JPG seulement.");
   }
 });
 
