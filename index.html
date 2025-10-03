@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Office Gratuit Web - Editor PDF/Word</title>
+  <title>Office Gratuit Web - Editor PDF/Word OCR</title>
   <link rel="stylesheet" href="style.css">
 
   <!-- Librairies -->
@@ -11,6 +11,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js"></script>
   <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
 </head>
 <body>
   <div class="background"></div>
@@ -25,12 +26,12 @@
       </ul>
     </nav>
     <h1>Office Gratuit Web</h1>
-    <p>Importer – Modifier – Convertir – Télécharger</p>
+    <p>Importer – Modifier – OCR – Convertir – Télécharger</p>
   </header>
 
   <main>
     <div class="upload-box" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      <p>🚀 Glissez-déposez un PDF ou cliquez ici</p>
+      <p>🚀 Glissez-déposez un PDF ou image ou cliquez ici</p>
       <input type="file" id="fileInput" hidden />
     </div>
 
