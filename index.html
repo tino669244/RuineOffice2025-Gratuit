@@ -3,17 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Office Gratuit Web</title>
+  <title>Office Gratuit Web - Editor PDF/Word</title>
   <link rel="stylesheet" href="style.css">
 
   <!-- Librairies -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js"></script>
+  <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <!-- DOCX Preview -->
-  <script src="https://cdn.jsdelivr.net/npm/docx-preview@0.4.2/dist/docx-preview.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docx-preview@0.4.2/dist/docx-preview.css">
 </head>
 <body>
   <div class="background"></div>
@@ -28,23 +25,21 @@
       </ul>
     </nav>
     <h1>Office Gratuit Web</h1>
-    <p>Importer – Visualiser – Convertir – Télécharger</p>
+    <p>Importer – Modifier – Convertir – Télécharger</p>
   </header>
 
   <main>
-    <!-- Upload -->
     <div class="upload-box" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      <p>🚀 Glissez-déposez un fichier ou cliquez ici</p>
+      <p>🚀 Glissez-déposez un PDF ou cliquez ici</p>
       <input type="file" id="fileInput" hidden />
     </div>
 
-    <!-- Preview -->
-    <div id="viewerContainer" style="display:none;">
-      <h3>📖 Document</h3>
-      <div id="viewer" class="viewer-box"></div>
+    <!-- CKEditor -->
+    <div id="editorContainer" style="display:none;">
+      <h3>📝 Éditeur PDF/Word</h3>
+      <div id="editor"></div>
     </div>
 
-    <!-- Actions -->
     <div class="action-row">
       <select id="conversionType">
         <option value="word">Enregistrer en Word</option>
