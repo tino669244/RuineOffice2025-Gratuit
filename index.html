@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Office Gratuit Web - CKEditor + OCR</title>
+<title>Office Gratuit Web - CKEditor + OCR + Animation</title>
 <link rel="stylesheet" href="style.css">
 
 <!-- Librairies -->
@@ -15,6 +15,16 @@
 </head>
 <body>
 <div class="background"></div>
+
+<!-- Texte animé -->
+<div class="floating-text">Tino Andaina.js</div>
+
+<!-- Icônes animées -->
+<div class="floating-icons">
+  <span class="icon">⭐</span>
+  <span class="icon">💻</span>
+  <span class="icon">📄</span>
+</div>
 
 <header>
   <nav class="menu-bar">
@@ -66,7 +76,6 @@
     <input type="file" id="fileInput" hidden />
   </div>
 
-  <!-- CKEditor -->
   <div id="editorContainer" style="display:none;">
     <h3>📝 Éditeur PDF/Word</h3>
     <div id="editor"></div>
