@@ -99,13 +99,18 @@ async function convertAndDownload() {
     downloadBlob(blob, "output.xlsx");
   }
   else if (type === "pdf") {
-    const { jsPDF } = window.jspdf || {};
-    if (!jsPDF) {
-      alert("Librairie jsPDF manquant, mila ampidirina raha PDF export");
-      return;
-    }
+    const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.text(content, 10, 10);
+    const lines = content.split("\n");
+    let y = 10;
+    lines.forEach(line => {
+      doc.text(line, 10, y);
+      y += 10;
+      if (y > 280) { // page pleine
+        doc.addPage();
+        y = 10;
+      }
+    });
     doc.save("output.pdf");
   }
 }
