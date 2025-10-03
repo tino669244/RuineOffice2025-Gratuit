@@ -1,78 +1,82 @@
-let editorInstance;
+let currentContent = ""; // hitahirizana texte brut
 
-// Init CKEditor
-ClassicEditor
-  .create(document.querySelector('#editor'))
-  .then(editor => {
-    editorInstance = editor;
-  })
-  .catch(error => {
-    console.error(error);
-  });
-
-// Handle Upload
+// Upload
 document.getElementById('fileInput').addEventListener('change', handleFile);
 
 async function handleFile(event) {
   const file = event.target.files[0];
   if (!file) return;
 
-  const reader = new FileReader();
   const ext = file.name.split('.').pop().toLowerCase();
+  const reader = new FileReader();
 
   if (ext === "pdf") {
     const pdfData = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
     let textContent = "";
+    document.getElementById("viewer").innerHTML = "";
+
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale: 1.2 });
+
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      await page.render({ canvasContext: context, viewport: viewport }).promise;
+      document.getElementById("viewer").appendChild(canvas);
+
       const text = await page.getTextContent();
       text.items.forEach(item => {
         textContent += item.str + " ";
       });
       textContent += "\n\n";
     }
-    document.getElementById('editorContainer').style.display = "block";
-    editorInstance.setData(textContent);
+
+    currentContent = textContent;
+    document.getElementById("viewerContainer").style.display = "block";
+
   } else if (ext === "docx") {
-    reader.onload = async (e) => {
-      const buffer = e.target.result;
-      const { parseDocument } = window.docx;
-      const doc = await parseDocument(buffer);
-      editorInstance.setData(doc.text || "");
-      document.getElementById('editorContainer').style.display = "block";
+    reader.onload = function(e) {
+      const arrayBuffer = e.target.result;
+      const container = document.getElementById("viewer");
+      container.innerHTML = "";
+      window.docx.renderAsync(arrayBuffer, container, null, { ignoreFonts: true })
+        .then(() => {
+          currentContent = container.innerText; // texte brut
+          document.getElementById("viewerContainer").style.display = "block";
+        });
     };
     reader.readAsArrayBuffer(file);
-  } else if (ext === "txt") {
-    reader.onload = (e) => {
-      editorInstance.setData(e.target.result);
-      document.getElementById('editorContainer').style.display = "block";
-    };
-    reader.readAsText(file);
+
   } else {
-    alert("Format non supporté (PDF, DOCX, TXT).");
+    alert("Format non supporté (PDF, DOCX).");
   }
 }
 
-// Convert & Download
+// Convertir & Télécharger
 function convertAndDownload() {
   const type = document.getElementById("conversionType").value;
-  const content = editorInstance.getData();
 
   if (type === "pdf") {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.html(content, {
-      callback: function (doc) {
-        doc.save("output.pdf");
-      },
-      x: 10,
-      y: 10
+    const lines = currentContent.split("\n");
+    let y = 10;
+    lines.forEach(line => {
+      doc.text(line, 10, y);
+      y += 10;
+      if (y > 280) {
+        doc.addPage();
+        y = 10;
+      }
     });
+    doc.save("output.pdf");
+
   } else if (type === "word") {
-    const blob = new Blob([content], {
-      type: "application/msword"
-    });
+    const blob = new Blob([currentContent], { type: "application/msword" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "output.doc";
