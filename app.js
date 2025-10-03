@@ -1,126 +1,81 @@
-const dropZone = document.getElementById("dropZone");
-const fileInput = document.getElementById("fileInput");
-const editorBox = document.getElementById("editorBox");
-const textEditor = document.getElementById("textEditor");
+let editorInstance;
 
-let fileContent = "";
+// Init CKEditor
+ClassicEditor
+  .create(document.querySelector('#editor'))
+  .then(editor => {
+    editorInstance = editor;
+  })
+  .catch(error => {
+    console.error(error);
+  });
 
-// --- Drag & Drop Upload ---
-dropZone.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  dropZone.classList.add("dragover");
-});
+// Handle Upload
+document.getElementById('fileInput').addEventListener('change', handleFile);
 
-dropZone.addEventListener("dragleave", () => {
-  dropZone.classList.remove("dragover");
-});
+async function handleFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
 
-dropZone.addEventListener("drop", (e) => {
-  e.preventDefault();
-  dropZone.classList.remove("dragover");
-  if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
-});
-
-fileInput.addEventListener("change", () => {
-  if (fileInput.files.length > 0) handleFile(fileInput.files[0]);
-});
-
-// --- Lire fichier ---
-async function handleFile(file) {
   const reader = new FileReader();
+  const ext = file.name.split('.').pop().toLowerCase();
 
-  if (file.type === "application/pdf") {
-    const pdfData = new Uint8Array(await file.arrayBuffer());
+  if (ext === "pdf") {
+    const pdfData = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
-    let text = "";
-
+    let textContent = "";
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      text += textContent.items.map(item => item.str).join(" ") + "\n\n";
+      const text = await page.getTextContent();
+      text.items.forEach(item => {
+        textContent += item.str + " ";
+      });
+      textContent += "\n\n";
     }
-
-    fileContent = text;
-    textEditor.value = text;
-    editorBox.style.display = "block";
-  }
-  else if (file.type.includes("excel")) {
-    reader.onload = function(e) {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-      const csv = XLSX.utils.sheet_to_csv(firstSheet);
-      fileContent = csv;
-      textEditor.value = csv;
-      editorBox.style.display = "block";
+    document.getElementById('editorContainer').style.display = "block";
+    editorInstance.setData(textContent);
+  } else if (ext === "docx") {
+    reader.onload = async (e) => {
+      const buffer = e.target.result;
+      const { parseDocument } = window.docx;
+      const doc = await parseDocument(buffer);
+      editorInstance.setData(doc.text || "");
+      document.getElementById('editorContainer').style.display = "block";
     };
     reader.readAsArrayBuffer(file);
-  }
-  else if (file.type.includes("word") || file.name.endsWith(".docx")) {
-    alert("Lecture Word simplifiée : texte brut seulement");
-    reader.onload = function(e) {
-      fileContent = e.target.result;
-      textEditor.value = e.target.result;
-      editorBox.style.display = "block";
+  } else if (ext === "txt") {
+    reader.onload = (e) => {
+      editorInstance.setData(e.target.result);
+      document.getElementById('editorContainer').style.display = "block";
     };
     reader.readAsText(file);
-  }
-  else {
-    reader.onload = function(e) {
-      fileContent = e.target.result;
-      textEditor.value = e.target.result;
-      editorBox.style.display = "block";
-    };
-    reader.readAsText(file);
+  } else {
+    alert("Format non supporté (PDF, DOCX, TXT).");
   }
 }
 
-// --- Convertir & Télécharger ---
-async function convertAndDownload() {
+// Convert & Download
+function convertAndDownload() {
   const type = document.getElementById("conversionType").value;
-  const content = textEditor.value;
+  const content = editorInstance.getData();
 
-  if (type === "word") {
-    const { Document, Packer, Paragraph } = window.docx;
-    const doc = new Document({
-      sections: [{ children: [new Paragraph(content)] }]
-    });
-
-    const blob = await Packer.toBlob(doc);
-    downloadBlob(blob, "output.docx");
-  }
-  else if (type === "excel") {
-    const rows = content.split("\n").map(r => r.split(","));
-    const worksheet = XLSX.utils.aoa_to_sheet(rows);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([wbout], { type: "application/octet-stream" });
-    downloadBlob(blob, "output.xlsx");
-  }
-  else if (type === "pdf") {
+  if (type === "pdf") {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    const lines = content.split("\n");
-    let y = 10;
-    lines.forEach(line => {
-      doc.text(line, 10, y);
-      y += 10;
-      if (y > 280) { // page pleine
-        doc.addPage();
-        y = 10;
-      }
+    doc.html(content, {
+      callback: function (doc) {
+        doc.save("output.pdf");
+      },
+      x: 10,
+      y: 10
     });
-    doc.save("output.pdf");
+  } else if (type === "word") {
+    const blob = new Blob([content], {
+      type: "application/msword"
+    });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "output.doc";
+    link.click();
   }
-}
-
-// --- Download helper ---
-function downloadBlob(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
 }
