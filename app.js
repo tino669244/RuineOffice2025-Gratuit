@@ -1,6 +1,5 @@
-let currentContent = ""; // hitahirizana texte brut
+let currentContent = ""; 
 
-// Upload
 document.getElementById('fileInput').addEventListener('change', handleFile);
 
 async function handleFile(event) {
@@ -45,7 +44,7 @@ async function handleFile(event) {
       container.innerHTML = "";
       window.docx.renderAsync(arrayBuffer, container, null, { ignoreFonts: true })
         .then(() => {
-          currentContent = container.innerText; // texte brut
+          currentContent = container.innerText; 
           document.getElementById("viewerContainer").style.display = "block";
         });
     };
@@ -56,7 +55,6 @@ async function handleFile(event) {
   }
 }
 
-// Convertir & Télécharger
 function convertAndDownload() {
   const type = document.getElementById("conversionType").value;
 
