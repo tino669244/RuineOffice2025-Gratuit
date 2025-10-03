@@ -1,52 +1,62 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Office Gratuit Modif</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Office Gratuit Web</title>
+  <link rel="stylesheet" href="style.css">
 
-<!-- Librairies -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/docx.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Librairies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/docx.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- CKEditor -->
+  <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
 </head>
 <body>
-<header>
-  <h1>📂 Office Gratuit Modif</h1>
-  <p>Importer – Modifier – Convertir – Télécharger</p>
-</header>
+  <header>
+    <nav>
+      <ul class="menu">
+        <li>📁 Fichier</li>
+        <li>✏️ Édition</li>
+        <li>📑 Mise en page</li>
+        <li>👁️ Affichage</li>
+      </ul>
+    </nav>
+    <h1>Office Gratuit Web</h1>
+    <p>Importer – Modifier – Convertir – Télécharger</p>
+  </header>
 
-<main>
-  <!-- Upload -->
-  <div class="upload-box" id="dropZone" onclick="document.getElementById('fileInput').click()">
-    <p>Glissez-déposez un fichier ou cliquez</p>
-    <input type="file" id="fileInput" hidden />
-  </div>
+  <main>
+    <!-- Upload -->
+    <div class="upload-box" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <p>Glissez-déposez un fichier ou cliquez</p>
+      <input type="file" id="fileInput" hidden />
+    </div>
 
-  <!-- Zone de modification -->
-  <div id="editorBox" style="display:none;">
-    <h3>📝 Modification du contenu</h3>
-    <textarea id="textEditor"></textarea>
-  </div>
+    <!-- Éditeur -->
+    <div id="editorContainer" style="display:none;">
+      <h3>📝 Document</h3>
+      <div id="editor"></div>
+    </div>
 
-  <!-- Actions -->
-  <div class="action-row">
-    <select id="conversionType">
-      <option value="word">Enregistrer en Word</option>
-      <option value="excel">Enregistrer en Excel</option>
-      <option value="pdf">Enregistrer en PDF</option>
-    </select>
-    <button onclick="convertAndDownload()">💾 Convertir & Télécharger</button>
-  </div>
-</main>
+    <!-- Actions -->
+    <div class="action-row">
+      <select id="conversionType">
+        <option value="word">Enregistrer en Word</option>
+        <option value="pdf">Enregistrer en PDF</option>
+      </select>
+      <button onclick="convertAndDownload()">💾 Convertir & Télécharger</button>
+    </div>
+  </main>
 
-<footer>
-  <p>© 2025 Office Gratuit Web</p>
-</footer>
+  <footer>
+    <p>© 2025 Office Gratuit Web</p>
+  </footer>
 
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
